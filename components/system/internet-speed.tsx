@@ -57,11 +57,13 @@ export default function InternetSpeed({
 			<p className="text-[#4A4A68] text-xs">Internet Speed</p>
 			<div
 				className={`h-6 w-6 flex justify-center items-center rounded-full ${
-					getProgressPercentage() < 30
+					!networkStatus
+						? "bg-main"
+						: getProgressPercentage() < 30
 						? "bg-red-600"
 						: getProgressPercentage() < 50
 						? "bg-yellow-600"
-						: "bg-main"
+						: "bg-green-600"
 				} absolute top-0 right-0`}
 			></div>
 		</div>

@@ -194,12 +194,23 @@ export default function SystemCheck() {
 
 	// Starts recording when assessment commencement prompt is accepted
 	useEffect(() => {
-		if (!acceptConfirmation) return;
-		recordVideo();
-		// Stop recording after 5 seconds
-		setTimeout(() => {
-			stopRecording();
-		}, 5000);
+		const recordAndStop = async () => {
+			if (!acceptConfirmation) return;
+
+			try {
+				await recordVideo();
+				const timer = setTimeout(() => {
+					stopRecording();
+				}, 5000);
+
+				// Cleanup function to clear timeout if component unmounts
+				return () => clearTimeout(timer);
+			} catch (error) {
+				console.error("Error during recording:", error);
+			}
+		};
+
+		recordAndStop();
 	}, [acceptConfirmation]);
 
 	// Function to record webcam stream
@@ -269,7 +280,7 @@ export default function SystemCheck() {
 
 				<div className="flex flex-col md:flex-row gap-10 my-8">
 					<div
-						className={`md:w-[300px] aspect-video h-[400px] md:h-auto border-2 ${
+						className={`md:w-[300px] aspect-video h-[300px] md:h-auto border-2 ${
 							recording ? "border-red-500" : "border-main"
 						} rounded-xl overflow-hidden relative`}
 					>
