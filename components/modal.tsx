@@ -1,6 +1,7 @@
 "use client";
 
-import React from "react";
+import { useTimeTracker } from "@/context/time";
+import React, { useEffect, useState } from "react";
 
 export default function Modal({
 	setShowModal,
@@ -13,9 +14,25 @@ export default function Modal({
 	recordVideo: () => Promise<void>;
 	stopRecording: () => Promise<void>;
 }) {
+	const { time, countdown } = useTimeTracker();
+	const [hasAssessmentStarted, setHasAssessmentStarted] = useState(false);
+
+	useEffect(() => {
+		let intervalId: any;
+
+		if (hasAssessmentStarted && time > 0) {
+			intervalId = setInterval(() => {
+				countdown();
+			}, 1000);
+		}
+
+		return () => clearInterval(intervalId);
+	}, [hasAssessmentStarted, time]);
+
 	const startAssesment = () => {
 		setAcceptConfirmation(true);
 		setShowModal(false);
+		setHasAssessmentStarted(true);
 		// Record video
 		recordVideo();
 		// Stop recording after 5 seconds
@@ -25,7 +42,7 @@ export default function Modal({
 	};
 	return (
 		<div className="fixed top-0 left-0 right-0 bottom-0 bg-black/80 z-50 flex justify-center items-center">
-			<div className="w-1/3 rounded-3xl flex flex-col h-[400px] bg-white overflow-hidden">
+			<div className="w-11/12 md:w-3/5 lg:w-1/3 rounded-lg md:rounded-xl lg:rounded-3xl flex flex-col h-[400px] bg-white overflow-hidden">
 				<div className="h-20 bg-main w-full text-white flex justify-between items-center p-4">
 					<h1 className="font-regular">Start assessment</h1>
 					<button

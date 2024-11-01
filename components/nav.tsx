@@ -7,23 +7,8 @@ import React, { useEffect, useState } from "react";
 import { MdOutlineTimerOff } from "react-icons/md";
 
 export default function Nav() {
-	const { time, countdown } = useTimeTracker();
+	const { time } = useTimeTracker();
 	const [showTimer, setShowTimer] = useState(true);
-	const [timeCounting, setTimeCounting] = useState(true);
-
-	useEffect(() => {
-		let intervalId: any;
-
-		if (timeCounting && time > 0) {
-			intervalId = setInterval(() => {
-				countdown();
-			}, 1000);
-		} else if (time === 0) {
-			setTimeCounting(false);
-		}
-
-		return () => clearInterval(intervalId);
-	}, [timeCounting, time]);
 
 	return (
 		<header className="bg-white px-4 md:px-12 lg:px-32 py-4 sticky top-0 border-b-background border-b-2">
