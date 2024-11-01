@@ -28,6 +28,8 @@ export default function SystemCheck() {
 	const [webcamVisualStream, setVisualStreamData] =
 		useState<MediaStream | null>(null);
 	const [audioDevice, setAudioDevice] = useState<MediaStream | null>();
+	const [combinedStreams, setCombinedStream] =
+		useState<globalThis.MediaStream | null>(null);
 	const [networkStatus, setNetworkStatus] = useState(0);
 	const [lightLevel, setLightLevel] = useState(0);
 	const [recording, setRecording] = useState(false);
@@ -43,14 +45,14 @@ export default function SystemCheck() {
 	useEffect(() => {
 		let intervalId: any;
 
-		if (acceptConfirmation && time > 0) {
+		if (acceptConfirmation && webcamVisualStream && time > 0) {
 			intervalId = setInterval(() => {
 				countdown();
 			}, 1000);
 		}
 
 		return () => clearInterval(intervalId);
-	}, [acceptConfirmation, time]); // Record video
+	}, [acceptConfirmation, time]);
 
 	// Get Video and Audio stream from Mic and Webcam and ave to their different states
 	useEffect(() => {
@@ -182,6 +184,7 @@ export default function SystemCheck() {
 				video: true,
 				audio: true,
 			});
+			setCombinedStream(stream);
 		} catch (error: any) {
 			console.error("Error accessing media devices:", error);
 			setError(error.message);
@@ -213,13 +216,15 @@ export default function SystemCheck() {
 		recordAndStop();
 	}, [acceptConfirmation]);
 
-	// Function to record webcam stream
+	// Function to record webcam and microphone stream
 	const recordVideo = async () => {
-		if (!webcamVisualStream) return;
+		if (!webcamVisualStream || !audioDevice) return;
+
+		const combinedStream = new MediaStream(combinedStreams!);
 
 		recordedSegments.current = [];
-		const mediaRecorder = new MediaRecorder(webcamVisualStream as any, {
-			mimeType: "video/mp4",
+		const mediaRecorder = new MediaRecorder(combinedStream, {
+			mimeType: "video/webm",
 		});
 
 		mediaRecorder.ondataavailable = (event) => {
@@ -229,13 +234,13 @@ export default function SystemCheck() {
 		};
 
 		mediaRecorder.onstop = () => {
-			const blob = new Blob(recordedSegments.current, { type: "video/mp4" });
+			const blob = new Blob(recordedSegments.current, { type: "video/webm" });
 			const url = URL.createObjectURL(blob);
 			const a = document.createElement("a");
 			document.body.appendChild(a);
 			a.style.display = "none";
 			a.href = url;
-			a.download = "recorded-video.mp4";
+			a.download = "recorded-video.webm";
 			a.click();
 			URL.revokeObjectURL(url);
 		};
