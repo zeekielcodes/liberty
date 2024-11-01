@@ -225,6 +225,8 @@ export default function SystemCheck() {
 				<Modal
 					setShowModal={setShowModal}
 					setAcceptConfirmation={setAcceptConfirmation}
+					recordVideo={recordVideo}
+					stopRecording={stopRecording}
 				/>
 			)}
 			<section className="bg-white rounded-xl p-4 md:p-6 w-full md:w-4/5 lg:w-3/5">

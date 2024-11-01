@@ -5,10 +5,24 @@ import React from "react";
 export default function Modal({
 	setShowModal,
 	setAcceptConfirmation,
+	recordVideo,
+	stopRecording,
 }: {
 	setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
 	setAcceptConfirmation: React.Dispatch<React.SetStateAction<boolean>>;
+	recordVideo: () => Promise<void>;
+	stopRecording: () => Promise<void>;
 }) {
+	const startAssesment = () => {
+		setAcceptConfirmation(true);
+		setShowModal(false);
+		// Record video
+		recordVideo();
+		// Stop recording after 5 seconds
+		setTimeout(() => {
+			stopRecording();
+		}, 5000);
+	};
 	return (
 		<div className="fixed top-0 left-0 right-0 bottom-0 bg-black/80 z-50 flex justify-center items-center">
 			<div className="w-1/3 rounded-3xl flex flex-col h-[400px] bg-white overflow-hidden">
@@ -32,10 +46,7 @@ export default function Modal({
 				</div>
 				<div className="flex justify-end p-6">
 					<button
-						onClick={() => {
-							setAcceptConfirmation(true);
-							setShowModal(false);
-						}}
+						onClick={startAssesment}
 						className="px-6 py-2 text-white text-lg rounded-lg bg-main"
 					>
 						Proceed
