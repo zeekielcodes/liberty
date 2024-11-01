@@ -11,7 +11,7 @@ export default function Nav() {
 	const [showTimer, setShowTimer] = useState(true);
 
 	return (
-		<header className="bg-white px-4 md:px-12 lg:px-32 py-4 sticky top-0 border-b-background border-b-2">
+		<header className="bg-white px-4 md:px-12 lg:px-32 py-4 sticky top-0 z-30 border-b-background border-b-2">
 			<nav className="flex flex-col md:flex-row justify-between gap-3 md:items-center">
 				<div className="flex gap-2 items-center">
 					<Image src="/logo.png" alt="Logo" height={50} width={50} />

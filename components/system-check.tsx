@@ -204,7 +204,7 @@ export default function SystemCheck() {
 				await recordVideo();
 				const timer = setTimeout(() => {
 					stopRecording();
-				}, 5000);
+				}, 10000);
 
 				// Cleanup function to clear timeout if component unmounts
 				return () => clearTimeout(timer);
