@@ -6,39 +6,13 @@ import React, { useEffect, useState } from "react";
 export default function Modal({
 	setShowModal,
 	setAcceptConfirmation,
-	recordVideo,
-	stopRecording,
 }: {
 	setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
 	setAcceptConfirmation: React.Dispatch<React.SetStateAction<boolean>>;
-	recordVideo: () => Promise<void>;
-	stopRecording: () => Promise<void>;
 }) {
-	const { time, countdown } = useTimeTracker();
-	const [hasAssessmentStarted, setHasAssessmentStarted] = useState(false);
-
-	useEffect(() => {
-		let intervalId: any;
-
-		if (hasAssessmentStarted && time > 0) {
-			intervalId = setInterval(() => {
-				countdown();
-			}, 1000);
-		}
-
-		return () => clearInterval(intervalId);
-	}, [hasAssessmentStarted, time]);
-
 	const startAssesment = () => {
 		setAcceptConfirmation(true);
 		setShowModal(false);
-		setHasAssessmentStarted(true);
-		// Record video
-		recordVideo();
-		// Stop recording after 5 seconds
-		setTimeout(() => {
-			stopRecording();
-		}, 5000);
 	};
 	return (
 		<div className="fixed top-0 left-0 right-0 bottom-0 bg-black/80 z-50 flex justify-center items-center">

@@ -24,7 +24,7 @@ export interface MediaStream {
 }
 
 export default function SystemCheck() {
-	const { time } = useTimeTracker();
+	const { time, countdown } = useTimeTracker();
 	const [webcamVisualStream, setVisualStreamData] =
 		useState<MediaStream | null>(null);
 	const [audioDevice, setAudioDevice] = useState<MediaStream | null>();
@@ -38,6 +38,19 @@ export default function SystemCheck() {
 	const videoRef = useRef<HTMLVideoElement>(null);
 	const recorderRef = useRef<MediaRecorder | null>(null);
 	const recordedSegments = useRef<Blob[]>([]);
+
+	// Initiate countdown
+	useEffect(() => {
+		let intervalId: any;
+
+		if (acceptConfirmation && time > 0) {
+			intervalId = setInterval(() => {
+				countdown();
+			}, 1000);
+		}
+
+		return () => clearInterval(intervalId);
+	}, [acceptConfirmation, time]); // Record video
 
 	// Get Video and Audio stream from Mic and Webcam and ave to their different states
 	useEffect(() => {
@@ -126,7 +139,7 @@ export default function SystemCheck() {
 		return () => clearInterval(interval);
 	}, [webcamVisualStream]);
 
-	// get bject detection and classification predictions using Tensorflow JS CocoSSD model
+	// get object detection and classification predictions using Tensorflow JS CocoSSD model
 	useEffect(() => {
 		setPredictions([]);
 		let isRunning = true;
@@ -179,6 +192,16 @@ export default function SystemCheck() {
 		setupMedia();
 	}, []);
 
+	// Starts recording when assessment commencement prompt is accepted
+	useEffect(() => {
+		if (!acceptConfirmation) return;
+		recordVideo();
+		// Stop recording after 5 seconds
+		setTimeout(() => {
+			stopRecording();
+		}, 5000);
+	}, [acceptConfirmation]);
+
 	// Function to record webcam stream
 	const recordVideo = async () => {
 		if (!webcamVisualStream) return;
@@ -225,8 +248,6 @@ export default function SystemCheck() {
 				<Modal
 					setShowModal={setShowModal}
 					setAcceptConfirmation={setAcceptConfirmation}
-					recordVideo={recordVideo}
-					stopRecording={stopRecording}
 				/>
 			)}
 			<section className="bg-white rounded-xl p-4 md:p-6 w-full md:w-4/5 lg:w-3/5">
@@ -248,7 +269,7 @@ export default function SystemCheck() {
 
 				<div className="flex flex-col md:flex-row gap-10 my-8">
 					<div
-						className={`md:w-[300px] aspect-video h-auto border-2 ${
+						className={`md:w-[300px] aspect-video h-[400px] md:h-auto border-2 ${
 							recording ? "border-red-500" : "border-main"
 						} rounded-xl overflow-hidden relative`}
 					>
