@@ -39,6 +39,7 @@ export default function SystemCheck() {
 	const recorderRef = useRef<MediaRecorder | null>(null);
 	const recordedSegments = useRef<Blob[]>([]);
 
+	// Get Video and Audio stream from Mic and Webcam and ave to their different states
 	useEffect(() => {
 		const setUpWebCam = async () => {
 			const visualStream = await window.navigator.mediaDevices.getUserMedia({
@@ -61,6 +62,7 @@ export default function SystemCheck() {
 		setUpWebCam();
 	}, []);
 
+	// Check network status every second
 	useEffect(() => {
 		const checkNetworkStatus = async () => {
 			const connection = (navigator as any).connection;
@@ -92,6 +94,7 @@ export default function SystemCheck() {
 		};
 	}, []);
 
+	// Detect light level from the stream gotten from webcam
 	useEffect(() => {
 		const detectLightLevel = () => {
 			if (!videoRef.current) return;
@@ -123,6 +126,7 @@ export default function SystemCheck() {
 		return () => clearInterval(interval);
 	}, [webcamVisualStream]);
 
+	// get bject detection and classification predictions using Tensorflow JS CocoSSD model
 	useEffect(() => {
 		setPredictions([]);
 		let isRunning = true;
@@ -158,6 +162,7 @@ export default function SystemCheck() {
 		};
 	}, [webcamVisualStream]);
 
+	// Check for device mic and webcam permission
 	const setupMedia = async () => {
 		try {
 			const stream = await navigator.mediaDevices.getUserMedia({
@@ -174,6 +179,7 @@ export default function SystemCheck() {
 		setupMedia();
 	}, []);
 
+	// Function to record webcam stream
 	const recordVideo = async () => {
 		if (!webcamVisualStream) return;
 
@@ -215,7 +221,12 @@ export default function SystemCheck() {
 
 	return (
 		<>
-			{showConfirmationModal && <Modal setShowModal={setShowModal} />}
+			{showConfirmationModal && (
+				<Modal
+					setShowModal={setShowModal}
+					setAcceptConfirmation={setAcceptConfirmation}
+				/>
+			)}
 			<section className="bg-white rounded-xl p-4 md:p-6 w-full md:w-4/5 lg:w-3/5">
 				<h2 className="text-lg font-semibold">System check</h2>
 				<p className="text-[#4A4A68] text-sm my-3">
