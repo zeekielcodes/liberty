@@ -204,7 +204,7 @@ export default function SystemCheck() {
 				await recordVideo();
 				const timer = setTimeout(() => {
 					stopRecording();
-				}, 10000);
+				}, 7000);
 
 				// Cleanup function to clear timeout if component unmounts
 				return () => clearTimeout(timer);
@@ -334,7 +334,7 @@ export default function SystemCheck() {
 						<BiSolidError /> {error}
 					</button>
 				)}
-				<div className="flex gap-2">
+				<div className="flex gap-2 flex-wrap">
 					<button
 						onClick={() => setShowModal(true)}
 						disabled={
@@ -343,7 +343,7 @@ export default function SystemCheck() {
 							!networkStatus ||
 							Math.round((lightLevel / 255) * 100) < 30
 						}
-						className="bg-main text-white rounded px-6 py-2 disabled:bg-main/50"
+						className="bg-main text-white rounded px-3 md:px-6 py-2 disabled:bg-main/50"
 					>
 						Take picture and continue
 					</button>
