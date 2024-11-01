@@ -10,13 +10,7 @@ import "@tensorflow/tfjs";
 import { useTimeTracker } from "@/context/time";
 import TimeUp from "./TimeUp";
 import Modal from "./modal";
-
-interface MediaDevice {
-	deviceId: string;
-	groupId: string;
-	kind: string;
-	label: string;
-}
+import { BiSolidError } from "react-icons/bi";
 
 interface Prediction {
 	bbox: number[];
@@ -39,19 +33,11 @@ export default function SystemCheck() {
 	const [recording, setRecording] = useState(false);
 	const [predictions, setPredictions] = useState<Prediction[]>([]);
 	const [showConfirmationModal, setShowModal] = useState(false);
+	const [acceptConfirmation, setAcceptConfirmation] = useState(false);
+	const [error, setError] = useState("");
 	const videoRef = useRef<HTMLVideoElement>(null);
 	const recorderRef = useRef<MediaRecorder | null>(null);
 	const recordedSegments = useRef<Blob[]>([]);
-
-	useEffect(() => {
-		const getMicrophone = async () => {
-			const audioDevice = await window.navigator.mediaDevices.getUserMedia({
-				audio: true,
-			});
-			setAudioDevice(audioDevice);
-		};
-		getMicrophone();
-	}, []);
 
 	useEffect(() => {
 		const setUpWebCam = async () => {
@@ -59,9 +45,15 @@ export default function SystemCheck() {
 				video: {
 					facingMode: "user",
 				},
-				audio: true,
 			});
 			setVisualStreamData(visualStream);
+
+			const audio = await window.navigator.mediaDevices.getUserMedia({
+				audio: true,
+			});
+
+			setAudioDevice(audio);
+
 			if (videoRef.current) {
 				videoRef.current.srcObject = visualStream;
 			}
@@ -166,11 +158,27 @@ export default function SystemCheck() {
 		};
 	}, [webcamVisualStream]);
 
+	const setupMedia = async () => {
+		try {
+			const stream = await navigator.mediaDevices.getUserMedia({
+				video: true,
+				audio: true,
+			});
+		} catch (error: any) {
+			console.error("Error accessing media devices:", error);
+			setError(error.message);
+		}
+	};
+
+	useEffect(() => {
+		setupMedia();
+	}, []);
+
 	const recordVideo = async () => {
 		if (!webcamVisualStream) return;
 
 		recordedSegments.current = [];
-		const mediaRecorder = new MediaRecorder(webcamVisualStream, {
+		const mediaRecorder = new MediaRecorder(webcamVisualStream as any, {
 			mimeType: "video/mp4",
 		});
 
@@ -260,6 +268,7 @@ export default function SystemCheck() {
 							</div>
 						)}
 					</div>
+
 					<div className="grid grid-cols-2 gap-4 w-52">
 						<WebCamCheck webcamVisualStream={webcamVisualStream} />
 						<InternetSpeed networkStatus={networkStatus} />
@@ -267,20 +276,36 @@ export default function SystemCheck() {
 						<Lighting lightLevel={lightLevel} />
 					</div>
 				</div>
-				<button
-					onClick={recordVideo}
-					className="bg-main text-white rounded px-6 py-2"
-				>
-					Take picture and continue
-				</button>
-				{recording && (
+				{error && (
 					<button
-						className="bg-red-500 text-white px-3 py-2 rounded"
-						onClick={stopRecording}
+						onClick={setupMedia}
+						className="text-red-500 border-red-500 px-4 py-2 rounded border-2 flex items-center gap-2 mb-3"
 					>
-						Stop recording
+						<BiSolidError /> {error}
 					</button>
 				)}
+				<div className="flex gap-2">
+					<button
+						onClick={() => setShowModal(true)}
+						disabled={
+							!webcamVisualStream ||
+							!audioDevice ||
+							!networkStatus ||
+							Math.round((lightLevel / 255) * 100) < 30
+						}
+						className="bg-main text-white rounded px-6 py-2 disabled:bg-main/50"
+					>
+						Take picture and continue
+					</button>
+					{recording && (
+						<button
+							className="bg-red-500 text-white px-3 py-2 rounded"
+							onClick={stopRecording}
+						>
+							Stop recording
+						</button>
+					)}
+				</div>
 			</section>
 		</>
 	);

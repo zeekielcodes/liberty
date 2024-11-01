@@ -4,8 +4,10 @@ import React from "react";
 
 export default function Modal({
 	setShowModal,
+	setAcceptConfirmation,
 }: {
 	setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
+	setAcceptConfirmation: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
 	return (
 		<div className="fixed top-0 left-0 right-0 bottom-0 bg-black/80 z-50 flex justify-center items-center">
@@ -29,7 +31,13 @@ export default function Modal({
 					</p>
 				</div>
 				<div className="flex justify-end p-6">
-					<button className="px-6 py-2 text-white text-lg rounded-lg bg-main">
+					<button
+						onClick={() => {
+							setAcceptConfirmation(true);
+							setShowModal(false);
+						}}
+						className="px-6 py-2 text-white text-lg rounded-lg bg-main"
+					>
 						Proceed
 					</button>
 				</div>
