@@ -298,7 +298,7 @@ export default function SystemCheck() {
 						>
 							{" "}
 						</video>
-						{predictions.length > 0 && (
+						{webcamVisualStream && predictions.length > 0 && (
 							<div className="absolute top-0 left-0 p-1 flex flex-col space-y-1">
 								{predictions.map((prediction, index) => (
 									<div
